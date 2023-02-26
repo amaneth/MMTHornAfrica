@@ -15,12 +15,13 @@ def export_csv_files(output_dir, df, direction='orm_eng_law'):
     df.to_csv(filename, index=False)
 
 
-def export_json_files(output_dir, df, direction='orm_eng_law'):
-
+def export_json_files(output_dir, source_path, direction='orm_eng_law'):
+    df = pd.read_csv(source_path)
+    print(df.columns)
     to_be_saved = []
     src_data = df['source_lang'].values
     tgt_data = df['target_lang'].values
-    src_lang, tgt_lang, domain = direction.split('_')
+    src_lang, tgt_lang = direction.split('_')
     N_sent = df.shape[0]
     for s in range(N_sent):
         text_string = {"translation": {src_lang:src_data[s], tgt_lang:tgt_data[s]}}
@@ -58,7 +59,7 @@ if __name__ == "__main__":
     parser.add_argument('--input',default='.')
     #parser.add_argument('--output', default='../csvfiles')
     parser.add_argument('--source', required = True)
-    parser.add_argument('--target', required = True)
+    parser.add_argument('--target', required = False)
     parser.add_argument('--to', default = 'csv')
     parser.add_argument('--direction', required = True)
 
@@ -69,10 +70,10 @@ if __name__ == "__main__":
     filetype = arguments.to
     direction = arguments.direction
 
-    parallel_df = parallel_translation_data(source_path, target_path, input_dir)  # replace direction with whatever translation direction
     
     if filetype == 'json':
-        export_json_files('../jsonfiles', parallel_df, direction=direction)
+        export_json_files('../jsonfiles',source_path, direction=direction)
     else:
+        parallel_df = parallel_translation_data(source_path, target_path, input_dir)  # replace direction with whatever translation direction
         export_csv_files('../csvfiles', parallel_df, direction=direction)
 
